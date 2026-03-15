@@ -10,7 +10,7 @@ Docker commands and workflows for Tender development.
 # Copy environment file
 cp .env.example .env
 
-# Edit .env with your configuration (e.g., Supabase URL/Key)
+# Edit .env with your configuration
 nano .env  # or your preferred editor
 
 # Build and start all services in detached mode
@@ -87,7 +87,7 @@ docker system prune -a
 
 ### Update Environment
 
-Ensure your `.env` contains the required production credentials (e.g., Supabase URL).
+Ensure your `.env` contains the required production credentials.
 
 ### Build Production Images
 

@@ -10,8 +10,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL:-http://localhost:54321}
-      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY:-your-anon-key}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tender}:${POSTGRES_PASSWORD:-tender_dev_password}@postgres:5432/${POSTGRES_DB:-tender}
       # Expo Web defaults to port 8081
       PORT: ${APP_PORT:-8081}
     ports:

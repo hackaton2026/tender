@@ -16,7 +16,7 @@ This guide covers Docker development setup and deployment for the Tender applica
 git clone https://git.myceli.al/deiim/tender.git
 cd tender
 cp .env.example .env
-# Edit .env with your configuration if necessary
+# Edit .env with your configuration
 ```
 
 2. **Build and start services:**
@@ -63,8 +63,7 @@ docker-compose logs -f app
   - `.` -> `/app` (hot reload in development)
   - `node_modules` (cached)
 - **Environment:**
-  - `EXPO_PUBLIC_SUPABASE_URL`
-  - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+  - `DATABASE_URL`
   - `PORT` (default 8081)
 
 #### PostgreSQL
@@ -107,8 +106,7 @@ docker run -p 80:80 tender-app:latest
    - **Build target:** `production`
 5. Environment variables (build time):
 ```
-EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL}
-EXPO_PUBLIC_SUPABASE_ANON_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY}
+DATABASE_URL=${DATABASE_URL}
 ```
 6. Port: `80` (Nginx default)
 7. Deploy.
