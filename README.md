@@ -31,7 +31,7 @@ cp .env.example .env
 # PROJECT LEAD: add dev start command
 ```
 
-The app should be available at `http://localhost:3000` (or update this if different).
+The app should be available at `http://localhost:8081` (or update this if different).
 
 ---
 

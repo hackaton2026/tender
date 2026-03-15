@@ -10,17 +10,17 @@ Docker commands and workflows for Tender development.
 # Copy environment file
 cp .env.example .env
 
-# Edit .env with your configuration
+# Edit .env with your configuration (e.g., Supabase URL/Key)
 nano .env  # or your preferred editor
 
-# Build and start all services
-docker-compose up -d
+# Build and start all services in detached mode
+docker-compose up -d --build
 
 # View logs
 docker-compose logs -f
 ```
 
-Access the application at http://localhost:3000
+Access the application at http://localhost:8081
 
 ### Daily Development
 
@@ -32,16 +32,14 @@ docker-compose up -d
 docker-compose down
 
 # Restart specific service
-docker-compose restart api
 docker-compose restart app
 
 # View logs for a service
-docker-compose logs -f api
 docker-compose logs -f app
 
-# Rebuild after code changes
-docker-compose build api
-docker-compose up -d api
+# Rebuild after adding new dependencies
+docker-compose build app
+docker-compose up -d app
 ```
 
 ### Database Operations
@@ -50,20 +48,15 @@ docker-compose up -d api
 # Connect to PostgreSQL
 docker-compose exec postgres psql -U tender
 
-# Run migrations (when implemented)
-docker-compose exec api npm run migrate
-
 # Reset database (careful!)
 docker-compose down -v
-docker-compose up -d postgres
-docker-compose up -d api app
+docker-compose up -d postgres app
 ```
 
 ### Debugging
 
 ```bash
 # Enter container shell
-docker-compose exec api sh
 docker-compose exec app sh
 
 # Check container status
@@ -71,12 +64,10 @@ docker-compose ps
 
 # Inspect container logs
 docker-compose logs postgres
-docker-compose logs api
 docker-compose logs app
 
-# Check health status
-docker-compose exec api curl http://localhost:3001/health
-docker-compose exec app curl http://localhost:3000/
+# Check web service
+curl http://localhost:8081/
 ```
 
 ### Cleanup
@@ -90,49 +81,29 @@ docker-compose down -v
 
 # Remove all unused Docker resources
 docker system prune -a
-
-# Remove images only
-docker image prune -a
 ```
 
 ## Production Deployment
 
 ### Update Environment
 
-```bash
-# Update production secrets
-# Variables:
-# POSTGRES_PASSWORD
-# JWT_SECRET
-# Any API keys needed
-```
+Ensure your `.env` contains the required production credentials (e.g., Supabase URL).
 
 ### Build Production Images
 
 ```bash
-# Build all services
-docker-compose build
+# Build production web bundle image
+docker build --target production -t tender-app-prod .
 
-# Build specific service
-docker-compose build --no-cache api
-```
-
-### Check Configuration
-
-```bash
-# Verify docker-compose syntax
-docker-compose config
-
-# Check environment variables
-docker-compose config | grep -v "_"
+# Run production container locally on port 80
+docker run -p 8080:80 -d tender-app-prod
 ```
 
 ## Service URL Reference
 
 | Service | Local URL | Description |
 |---------|-----------|-------------|
-| App | http://localhost:3000 | Frontend application |
-| API | http://localhost:3001 | Backend API |
+| App (Dev) | http://localhost:8081 | Frontend application (hot-reloading) |
 | PostgreSQL | localhost:5432 | Database |
 
 ## Common Issues
@@ -144,9 +115,8 @@ docker-compose logs <service-name>
 
 **Port conflict:**
 ```bash
-# Change port in .env
-# APP_PORT=3001
-# API_PORT=3002
+# Change port mapping in docker-compose.yml or use APP_PORT in .env
+# APP_PORT=8082
 ```
 
 **Database connection failed:**
@@ -177,10 +147,3 @@ dcu    # up -d
 dcd    # down
 dcl    # logs -f
 ```
-
-## Next Steps
-
-1. Complete `.env` configuration
-2. `docker-compose up -d` to start
-3. Visit http://localhost:3000
-4. Check logs with `docker-compose logs -f`
