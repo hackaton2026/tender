@@ -14,18 +14,18 @@ Tender uses a Linear + Cyrus workflow. Cyrus is an AI agent that picks up Linear
 
 2. Install dependencies
    ```bash
-   # PROJECT LEAD: add actual install commands here
+   npm install
    ```
 
 3. Copy environment config
    ```bash
    cp .env.example .env
-   # Fill in values — ask the project lead for secrets
+   # Fill in values — ask the project lead for Supabase secrets
    ```
 
 4. Run locally
    ```bash
-   # PROJECT LEAD: add dev start command here
+   npx expo start
    ```
 
 ---

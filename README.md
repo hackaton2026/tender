@@ -7,31 +7,33 @@ A mobile-first vertical video platform for civic engagement. Record, share, and 
 ## Getting started
 
 ### Prerequisites
-<!-- PROJECT LEAD: Fill in actual requirements -->
-- [e.g. Node 20+, Python 3.11+]
-- [e.g. Docker, or Postgres running locally]
+- Node 20+
+- Docker and Docker Compose (for containerized development), or
+- Expo CLI (`npx expo`) for native/local development
 
 ### Install
 
 ```bash
 git clone https://git.myceli.al/deiim/tender.git
 cd tender
-
-# Install dependencies
-# PROJECT LEAD: add actual install command(s)
+npm install
 
 # Configure environment
 cp .env.example .env
-# Fill in values — ask the project lead for secrets
+# Fill in values — ask the project lead for Supabase secrets
 ```
 
 ### Run locally
 
 ```bash
-# PROJECT LEAD: add dev start command
+# Native development (iOS/Android/Web)
+npx expo start
+
+# Or with Docker (web only)
+docker-compose up -d --build
 ```
 
-The app should be available at `http://localhost:8081` (or update this if different).
+The web app is available at `http://localhost:8081`.
 
 ---
 
@@ -39,13 +41,14 @@ The app should be available at `http://localhost:8081` (or update this if differ
 
 ```
 /
-├── app/          # Mobile/frontend application
-├── api/          # Backend API server
-├── shared/       # Types and utilities shared between app and api
-├── infra/        # Infrastructure config
-└── docs/         # Additional documentation
+├── app/          # Expo Router pages and screens
+├── src/          # Source code (components, hooks, lib, store, utils, types)
+├── components/   # Shared UI components
+├── constants/    # App constants (e.g. Colors)
+├── assets/       # Images, fonts, splash screens
+├── docs/         # Docker and quickstart guides
+└── supabase-schema.sql  # Database schema
 ```
-<!-- PROJECT LEAD: Update to match actual repo layout -->
 
 ---
 
@@ -56,12 +59,14 @@ We use Linear for issue tracking and Cyrus (an AI agent) for development. See [C
 ---
 
 ## Stack
-<!-- PROJECT LEAD: Fill in once decided -->
+
 | Layer | Technology |
 |---|---|
-| Frontend | |
-| Backend | |
-| Database | |
-| Video | |
-| Auth | |
-| Hosting | |
+| Frontend | React Native / Expo 55 (expo-router, TypeScript) |
+| Backend | Supabase (BaaS) |
+| Database | PostgreSQL via Supabase |
+| Video | expo-video, expo-camera |
+| Auth | Supabase Auth |
+| State | Zustand + TanStack React Query |
+| UI | React Native Paper + Lucide icons |
+| Hosting | Docker / Nginx for web |

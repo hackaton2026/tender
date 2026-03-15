@@ -4,23 +4,26 @@
 Tender is a mobile-first vertical video platform for civic engagement. Users record, share, and respond to short-form video content tied to local civic issues, candidates, ballot measures, and community discussions.
 
 ## Stack
-<!-- PROJECT LEAD: Fill in the actual stack before committing -->
-- **Frontend:** [e.g. React Native / Expo, or Next.js mobile-optimized]
-- **Backend:** [e.g. Node/Express, Python/FastAPI]
-- **Database:** [e.g. PostgreSQL, Supabase]
-- **Video:** [e.g. Mux, Cloudflare Stream]
-- **Auth:** [e.g. Clerk, Auth.js]
-- **Hosting:** [e.g. Fly.io, Vercel, Railway]
+- **Frontend:** React Native / Expo 55 (expo-router, TypeScript)
+- **Backend:** Supabase (BaaS — no separate API server)
+- **Database:** PostgreSQL via Supabase
+- **Video:** expo-video, expo-camera
+- **Auth:** Supabase Auth
+- **State:** Zustand + TanStack React Query
+- **UI:** React Native Paper + Lucide icons
+- **Forms:** React Hook Form + Zod
+- **Hosting:** Docker / Nginx for web deployment
 
 ## Repo layout
-<!-- PROJECT LEAD: Update this to match actual structure once scaffolded -->
 ```
 /
-├── app/          # Mobile/frontend application
-├── api/          # Backend API server
-├── shared/       # Types and utilities shared between app and api
-├── infra/        # Infrastructure config (do not touch without human review)
-└── docs/         # Additional documentation
+├── app/          # Expo Router pages and screens
+├── src/          # Source code (components, hooks, lib, store, utils, types)
+├── components/   # Shared UI components
+├── constants/    # App constants (e.g. Colors)
+├── assets/       # Images, fonts, splash screens
+├── docs/         # Docker and quickstart guides
+└── supabase-schema.sql  # Database schema
 ```
 
 ## Branch conventions
@@ -38,20 +41,17 @@ One branch per Linear issue. No exceptions.
 Always link the Linear issue in the PR description.
 
 ## Before opening a PR
-<!-- PROJECT LEAD: Replace with actual commands -->
-- [ ] `[test command]` passes
-- [ ] `[lint command]` passes
+- [ ] `npx tsc --noEmit` passes (type checking)
 - [ ] No hardcoded secrets or API keys
 - [ ] Mobile viewport tested (if frontend)
 
 ## Current priorities
-<!-- PROJECT LEAD: Keep this section updated — Cyrus reads it on every task -->
-[Update this with current sprint focus, e.g. "Focus on core video feed and auth — defer social features"]
+Focus on core proposal feed, video recording, and auth — defer social features and notifications.
 
 ## Do not touch without human review
-- `infra/` — all infrastructure config
-- Auth configuration and middleware
-- Video ingestion pipeline
+- Docker and deployment config (`Dockerfile`, `docker-compose.yml`)
+- Supabase auth configuration and RLS policies
+- `supabase-schema.sql` — database schema
 - Any file touching payments or PII
 
 ## Civic content considerations
