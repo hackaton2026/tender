@@ -1,79 +1,41 @@
-# Multi-stage Dockerfile for Tender platform
-# Supports building both app (frontend) and api (backend) services
+# Stage 1: Build the Expo Web app
+FROM node:20-alpine AS builder
 
-# Base image with Node.js
-FROM node:20-alpine AS base
 WORKDIR /app
 
-# Install dependencies for native modules
-RUN apk add --no-cache libc6-compat
+# Copy package files
+COPY package.json package-lock.json ./
 
-# Set default environment variables
-ENV NODE_ENV=production
-ENV PNPM_VERSION=9
+# Install dependencies (use npm ci for reliable builds)
+RUN npm ci
 
-# Install pnpm
-RUN npm install -g pnpm@${PNPM_VERSION}
+# Copy the rest of the application code
+COPY . .
 
-# Dependencies stage
-FROM base AS dependencies
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
+# Build the web version of the Expo app (outputs to the 'dist' folder)
+# We pass environment variables here if needed for the build process
+RUN npx expo export -p web
 
-# Install all dependencies
-RUN pnpm install --frozen-lockfile
+# Stage 2: Serve the static files with Nginx
+FROM nginx:alpine
 
-# API build stage
-FROM dependencies AS api-build
-# Copy shared types and utilities
-COPY shared ./shared
-COPY api ./api
+# Copy the built files from the builder stage to Nginx's default public directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Build API (adjust based on your build tool)
-RUN pnpm --filter api build
+# Copy custom Nginx configuration if you need client-side routing support (like Expo Router on web)
+# Since Expo Router relies on HTML5 history mode, we must configure Nginx to fallback to index.html
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $$uri $$uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
-# API production stage
-FROM base AS api
-WORKDIR /app
+# Expose port 80
+EXPOSE 80
 
-# Copy dependency files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=api-build /app/api ./api
-COPY --from=api-build /app/shared ./shared
-
-# Expose API port
-EXPOSE 3001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start API
-CMD ["pnpm", "--filter", "api", "start"]
-
-# App build stage
-FROM dependencies AS app-build
-# Copy shared types and utilities
-COPY shared ./shared
-COPY app ./app
-
-# Build app (adjust based on your build tool)
-RUN pnpm --filter app build
-
-# App production stage
-FROM node:20-alpine AS app
-WORKDIR /app
-
-# Copy built app
-COPY --from=app-build /app/app/build ./app/build
-COPY app/package.json ./app
-
-# Expose app port
-EXPOSE 3000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start app
-CMD ["npm", "start"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
