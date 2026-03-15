@@ -8,7 +8,7 @@ Tender uses a Linear + Cyrus workflow. Cyrus is an AI agent that picks up Linear
 
 1. Clone the repo
    ```bash
-   git clone https://git.myceli.al/deiim/tender.git
+   git clone git@github.com:hackaton2026/tender.git
    cd tender
    ```
 
@@ -86,6 +86,50 @@ If you're doing the work yourself (not via Cyrus):
 1. Assign just yourself, move to In Progress
 2. `git checkout -b feature/TEN-{number}-{slug}`
 3. Work, commit, push, open PR
+
+### Using the Ralph loop for larger tasks
+
+For bigger issues where you want Claude Code to work autonomously through multiple steps, we have a **Ralph Wiggum loop** set up. Instead of babysitting Claude, the loop continuously re-invokes it — each iteration assesses the codebase, picks the single most important next step, executes it, and commits.
+
+**One-time setup** — add the stop hook to your local settings (this file is gitignored):
+
+```bash
+# .claude/settings.local.json — add the hooks block
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/ralph-stop.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Running it:**
+
+```bash
+./ralph.sh                # Run until you touch .ralph-stop
+./ralph.sh --max 10       # Cap at 10 iterations
+./ralph.sh --max 10 --dangerously-skip-permissions  # Full autonomy
+```
+
+**Stopping it:**
+
+```bash
+touch .ralph-stop         # Stops after the current iteration finishes
+```
+
+Each iteration spawns three parallel agents (state, goals, blockers), then uses a priority stack to decide what to do next: fix broken builds first, then finish in-progress work, then tackle the next acceptance criterion. Progress lives in git — when the context window fills up, a fresh session picks up where the last left off.
+
+See `docs/ralph-loop-prompt.md` for the full architecture and prompt details.
 
 ---
 
